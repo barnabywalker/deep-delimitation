@@ -9,7 +9,7 @@ from torch import nn
 from torchmetrics.functional import accuracy as tm_accuracy
 from torchmetrics.functional.classification.f_beta import f1_score
 
-from ..models import ProjectionHead
+from .projection import ProjectionHead
 
 TARGETS = ["name", "species", "genus", "family", "order"]
 

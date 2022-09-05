@@ -5,7 +5,7 @@ def ntxent(x1, x2, temperature, eps=1e-6):
     x = torch.cat([x1, x2], dim=0)
     x_scores = torch.mm(x, x.t())
     
-    sim = torch.exp(x_scores, temperature)
+    sim = torch.exp(x_scores / temperature)
     neg = sim.sum(dim=-1)
 
     row_sub = torch.Tensor(neg.shape).fill_(math.e ** (1 / temperature)).to(neg.device)

@@ -7,14 +7,17 @@ from pl_bolts.optimizers.lr_scheduler import linear_warmup_decay
 
 from ..losses import ntxent
 
-from ..models import ProjectionHead
+from .projection import ProjectionHead
 
 class SimCLR(pl.LightningModule):
     def __init__(self, encoder, feat_dim=128, hidden_dim=None, proj_layers=1, temperature=0.1, max_epochs=10,
-                 warmup_epochs=1):
+                 warmup_epochs=1, lr=1e-3, train_iters_per_epoch=100):
         super().__init__()
         self.warmup_epochs = warmup_epochs
         self.max_epochs = max_epochs
+        self.temperature = temperature
+        self.lr = lr
+        self.train_iters_per_epoch = train_iters_per_epoch
 
         self.encoder = encoder
 
@@ -43,7 +46,7 @@ class SimCLR(pl.LightningModule):
         loss = self.evaluate(batch)
         self.log("val_loss", loss, prog_bar=True, sync_dist=True)
 
-    def validation_step(self, batch, batch_idx, dataloader_idx):
+    def test_step(self, batch, batch_idx, dataloader_idx):
         loss = self.evaluate(batch)
         self.log("test_loss", loss, prog_bar=True, sync_dist=True)
 
@@ -59,6 +62,8 @@ class SimCLR(pl.LightningModule):
             ),
             "interval": "step",
             "frequency": 1,
+            "name": "LambdaLR_lr"
         }
 
-        return [optimiser], [{"scheduler": scheduler, "interval": "step", "name": f"LambdaLR_lr"}]
+        return [optimiser], [scheduler]
+        
