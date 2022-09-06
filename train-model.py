@@ -58,6 +58,9 @@ def cli_main():
     print("setting up loggers...")
     csv_logger = pl.loggers.CSVLogger("lightning_logs", name=name)
     version = csv_logger.version
+
+    if not os.path.exists("output"):
+        os.mkdir("output")
     
     if not os.path.exists(os.path.join("output", name)):
         os.mkdir(os.path.join("output", name))
@@ -90,7 +93,13 @@ def cli_main():
     #----------
     # data    |
     #----------
-    dm = HalfEarthModule(data_dir=args.data, target_type=args.target, num_workers=args.num_workers, balanced=args.balanced)
+    dm = HalfEarthModule(
+        data_dir=args.data, 
+        target_type=args.target, 
+        num_workers=args.num_workers, 
+        balanced=args.balanced,
+        batch_size=args.batch_size
+    )
     if args.model_type == "simclr":
         dm.train_transform = SimCLRTransforms(args.input_height)
         dm.val_transform = SimCLRTransforms(args.input_height)
@@ -134,7 +143,7 @@ def cli_main():
             proj_layers=args.proj_layers, 
             temperature=args.temperature, 
             max_epochs=args.max_epochs,
-            train_iters_per_epoch=len(dm.dataset_train)
+            train_iters_per_epoch=len(dm.train_dataloader())
         )
 
     print("set up model")

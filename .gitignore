@@ -1,3 +1,9 @@
 *.ipynb
 output/
 data/
+__pycache__/
+*.out
+*.sh
+wandb/
+*.ckpt
+lightning_logs/

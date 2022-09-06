@@ -1,9 +1,7 @@
 import json
-import csv
 import kaggle
 import zipfile
 import os
-import torch
 
 from PIL import Image
 from torch.utils.data import Subset
