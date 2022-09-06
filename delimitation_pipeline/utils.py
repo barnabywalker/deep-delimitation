@@ -12,7 +12,7 @@ def check_uncommitted(warn=False):
     changes = subprocess.check_output(["git", "diff-index", "--name-only", "HEAD", "--"]).strip().decode()
 
     msg = "Uncommited changes detected. Please consider committing your changes before training, for reproducibility."
-    if changes == "":
+    if changes != "":
         if warn:
             warnings.warn(msg, UncommittedWarning)
         else:
