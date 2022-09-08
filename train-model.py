@@ -142,6 +142,7 @@ def cli_main():
             feat_dim=args.feat_dim,
             proj_layers=args.proj_layers, 
             temperature=args.temperature, 
+            lr=args.lr,
             max_epochs=args.max_epochs,
             train_iters_per_epoch=len(dm.train_dataloader())
         )
