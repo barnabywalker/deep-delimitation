@@ -39,7 +39,7 @@ def cli_main():
     parser.add_argument("--num_workers", default=0, type=int)
     parser.add_argument("--lr", default=1e-3, type=float)
     parser.add_argument("--max_lr", default=None, type=float)
-    parser.add_argument("--scheduler", default=None, type=str, choices=[None, "one_cycle", "plateau"])
+    parser.add_argument("--scheduler", default=None, type=str, choices=[None, "one_cycle", "plateau", "lambda_lr"])
     parser.add_argument("--backbone", default="resnet18", type=str, choices=["resnet18", "resnet50", "convnext"])
     parser = pl.Trainer.add_argparse_args(parser)
     args = parser.parse_args()
@@ -144,6 +144,7 @@ def cli_main():
             temperature=args.temperature, 
             lr=args.lr,
             max_epochs=args.max_epochs,
+            scheduler=args.scheduler,
             train_iters_per_epoch=len(dm.train_dataloader())
         )
 
