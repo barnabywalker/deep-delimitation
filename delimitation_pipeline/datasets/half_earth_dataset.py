@@ -1,14 +1,14 @@
 import json
-import csv
 import kaggle
 import zipfile
 import os
-import torch
 
 from PIL import Image
 from torch.utils.data import Subset
 from torchvision.datasets.vision import VisionDataset
 from typing import Union, Callable, List, Optional, Tuple, Any
+
+from delimitation_pipeline.datasets.utils import _download_kaggle, _extract_archive
 
 CATEGORIES = ["order", "family", "genus", "species", "name"]
 
@@ -20,16 +20,8 @@ def download_from_kaggle(
 ) -> None:
     if extract_root is None:
         extract_root = download_root
-
-    kaggle.api.competition_download_files(dataset_name, path=download_root)
-    archive = os.path.join(download_root, f"{dataset_name}.zip")
-    print(f"Extracting {archive} to {extract_root}")
-    with zipfile.ZipFile(archive, "r", compression=zipfile.ZIP_STORED) as zip:
-        zip.extractall(extract_root)
-
-    if remove_finished:
-        os.remove(archive)
-
+    archive = _download_kaggle(dataset_name, download_root)
+    _extract_archive(archive, extract_root, remove_finished=remove_finished)
 
 def _verify_type(value: str, valid_values: Optional[List[str]]=None) -> str:
     if valid_values is None:
