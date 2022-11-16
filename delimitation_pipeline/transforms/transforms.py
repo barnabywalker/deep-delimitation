@@ -3,6 +3,7 @@ from PIL import Image
 
 __all__ = [
     "CropAspect",
+    "PadAspect",
     "SimCLRTransforms"
 ]
 class CropAspect(object):
@@ -29,6 +30,35 @@ class CropAspect(object):
         left = (w - new_w) // 2
 
         return transforms.functional.crop(img, top, left, new_h, new_w)
+
+class PadAspect(object):
+    """Pad an image along shortest dimension to achieve a particular aspect ratio.
+
+    Args:
+        aspect (float): Desired aspect ratio of output image. Image dimensions are
+        integers, so the realised aspect ratio might not match this exactly.
+        mode (str): Method used to pad image, one of ("constant", "edge", "reflection", "symmetry").
+    """
+    def __init__(self, aspect=1, mode="constant"):
+        assert isinstance(aspect, (float, int))
+        assert isinstance(mode, str)
+        self.output_aspect = aspect
+        self.pad_mode = mode
+
+    def __call__(self, img):
+        if isinstance(img, Image.Image):
+            w, h = img.size
+        else:
+            h, w = img.shape[:2]
+
+        new_h = (w // self.output_aspect) if h < w else h
+        new_w = (h // self.output_aspect) if w < h else w
+
+        pad_h = (new_h - h) // 2
+        pad_w = (new_w - w) // 2
+
+        return transforms.functional.pad(img, [pad_w, pad_h])
+        
 
 class SimCLRTransforms(object):
     def __init__(self, input_height, guassian_blur=True, jitter_strength=1):
