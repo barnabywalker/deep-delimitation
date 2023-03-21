@@ -39,7 +39,7 @@ def cli_main():
     parser.add_argument("--num_workers", default=0, type=int)
     parser.add_argument("--lr", default=1e-3, type=float)
     parser.add_argument("--max_lr", default=None, type=float)
-    parser.add_argument("--scheduler", default=None, type=str, choices=[None, "one_cycle", "plateau"])
+    parser.add_argument("--scheduler", default=None, type=str, choices=[None, "one_cycle", "plateau", "lambda_lr"])
     parser.add_argument("--backbone", default="resnet18", type=str, choices=["resnet18", "resnet50", "convnext"])
     parser = pl.Trainer.add_argparse_args(parser)
     args = parser.parse_args()
@@ -58,6 +58,9 @@ def cli_main():
     print("setting up loggers...")
     csv_logger = pl.loggers.CSVLogger("lightning_logs", name=name)
     version = csv_logger.version
+
+    if not os.path.exists("output"):
+        os.mkdir("output")
     
     if not os.path.exists(os.path.join("output", name)):
         os.mkdir(os.path.join("output", name))
@@ -90,7 +93,13 @@ def cli_main():
     #----------
     # data    |
     #----------
-    dm = HalfEarthModule(data_dir=args.data, target_type=args.target, num_workers=args.num_workers, balanced=args.balanced)
+    dm = HalfEarthModule(
+        data_dir=args.data, 
+        target_type=args.target, 
+        num_workers=args.num_workers, 
+        balanced=args.balanced,
+        batch_size=args.batch_size
+    )
     if args.model_type == "simclr":
         dm.train_transform = SimCLRTransforms(args.input_height)
         dm.val_transform = SimCLRTransforms(args.input_height)
@@ -133,8 +142,10 @@ def cli_main():
             feat_dim=args.feat_dim,
             proj_layers=args.proj_layers, 
             temperature=args.temperature, 
+            lr=args.lr,
             max_epochs=args.max_epochs,
-            train_iters_per_epoch=len(dm.dataset_train)
+            scheduler=args.scheduler,
+            train_iters_per_epoch=len(dm.train_dataloader())
         )
 
     print("set up model")
