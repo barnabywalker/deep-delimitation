@@ -1,14 +1,10 @@
-# Delimitation of *Myrcia* species using deep learning
+# Delimitation of species using deep learning
 
-The aim of this project is to investigate how useful representations of herbarium specimens learned by deep neural networks are in the species delimitation workflow.
+This repository contains code to train deep neural networks on large herbarium specimen image datasets, hopefully to learn generalisable representations that can be used to help delimit species concepts.
 
-Eventually this pipeline should include scripts for:
+So far, the pipeline has functions to train a classifier and a self-supervised network to extract features from herbarium specimen images which can be used as the input for hierarchical clustering.
 
-- [ ] Masking specimens from sheets using segmentation
-- [ ] Training a classifier on a large image dataset
-- [ ] Training a self-supervised model on a large image dataset
-- [ ] Evaluating the performance of features extracted from these large models on downstream tasks
-- [ ] Hierarchical clustering of features for species delimitation
+The training runs of these networks can be viewed on [this Weights & Biases page](https://wandb.ai/barnabywalker/species-delimitation/overview).
 
 ## Structure
 
